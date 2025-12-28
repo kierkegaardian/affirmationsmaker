@@ -1,0 +1,58 @@
+{
+  "project_id": "demo-project",
+  "sample_rate": 48000,
+  "duration_sec": 600,
+  "affirmations": [
+    {
+      "id": "a1",
+      "text": "I do what I say I will do.",
+      "tags": ["discipline"]
+    },
+    {
+      "id": "a2",
+      "text": "I finish what I start.",
+      "tags": ["focus"]
+    }
+  ],
+  "script": {
+    "mode": "triple_stack",
+    "repeat_each": 4,
+    "gap_ms": 400,
+    "shuffle": false,
+    "seed": 0
+  },
+  "tts": {
+    "provider": "dummy",
+    "voice": null,
+    "rate": 1.0,
+    "model_path": null
+  },
+  "music": {
+    "provider": "placeholder",
+    "prompt": "downtempo ambient beat, no vocals, warm pads",
+    "seed": 123,
+    "build_mode": "loop_crossfade",
+    "chunk_sec": 30,
+    "crossfade_ms": 1500,
+    "bpm": null,
+    "model_id": null,
+    "device": null,
+    "steps": 100,
+    "guidance_scale": null,
+    "sigma_min": null,
+    "sigma_max": null,
+    "sampler": null
+  },
+  "binaural": {
+    "enabled": true,
+    "carrier_hz": 220,
+    "beat_hz": 6,
+    "gain_db": -30,
+    "fade_in_ms": 10000,
+    "fade_out_ms": 10000
+  },
+  "mix": {
+    "master_peak_db": -1.0,
+    "target_lufs": null
+  }
+}

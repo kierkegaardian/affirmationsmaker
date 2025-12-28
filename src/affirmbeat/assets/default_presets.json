@@ -1,0 +1,7 @@
+{
+  "overlap_modes": ["single", "triple_stack", "lead_whisper", "call_response"],
+  "mix": {
+    "master_peak_db": -1.0,
+    "target_lufs": null
+  }
+}
