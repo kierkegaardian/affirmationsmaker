@@ -27,6 +27,19 @@ Expected outputs:
 - `projects/output/stems/*.wav`
 - `projects/output/render_report.json`
 
+## Linux prerequisites
+
+The Python `soundfile` dependency requires `libsndfile` on Linux. Install it with your package manager, for example:
+
+- Debian/Ubuntu: `libsndfile1` (runtime) and `libsndfile1-dev` (build headers, if needed)
+- Fedora/RHEL: `libsndfile`
+- Arch: `libsndfile`
+
+Optional binaries are only needed when you select the corresponding provider:
+
+- `espeak`/`espeak-ng` for `tts.provider = "espeak"`.
+- `piper` for `tts.provider = "piper1"` (with `tts.model_path`).
+
 ## Notes
 
 - Default TTS provider is `dummy` (sine-tone placeholder). To use Piper, install the `piper` binary and set `tts.provider` to `piper1` with `tts.model_path`.
