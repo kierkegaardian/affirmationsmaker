@@ -128,6 +128,7 @@ def render_project(project_path: Path) -> Path:
     tts = _tts_provider(project)
 
     total_samples = int(project.duration_sec * project.sample_rate)
+    allowed_modes = {"single", "triple_stack", "lead_whisper", "call_response"}
     clips: list[Clip] = []
     if project.voice_tracks:
         for track in project.voice_tracks:
@@ -135,7 +136,15 @@ def render_project(project_path: Path) -> Path:
                 continue
             script_cfg = project.script
             if track.mode:
-                script_cfg = project.script.model_copy(update={"mode": track.mode})
+                if track.mode not in allowed_modes:
+                    raise ValueError(
+                        f"Invalid track.mode '{track.mode}' for track '{track.id}'. "
+                        f"Supported modes: {', '.join(sorted(allowed_modes))}."
+                    )
+                script_cfg = project.script.model_copy(
+                    update={"mode": track.mode},
+                    validate=True,
+                )
             utterance_plans = build_utterance_plans(track.lines, script_cfg)
             current_start = int((track.start_offset_ms / 1000.0) * project.sample_rate)
             gap_samples = int((script_cfg.gap_ms / 1000.0) * project.sample_rate)

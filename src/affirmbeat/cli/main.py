@@ -11,6 +11,7 @@ from affirmbeat.render.renderer import render_project
 from affirmbeat.script.textgen import generate_tracks
 
 app = typer.Typer(help="AffirmBeat Studio CLI")
+SUPPORTED_MODES = ("single", "triple_stack", "lead_whisper", "call_response")
 
 
 def _default_project() -> Project:
@@ -39,6 +40,16 @@ def _prompt_lines(label: str) -> list[str]:
     return lines
 
 
+def _normalize_mode(mode: str, label: str) -> str:
+    normalized = mode.strip()
+    lowered = normalized.lower()
+    if lowered in SUPPORTED_MODES:
+        return lowered
+    raise typer.BadParameter(
+        f"{label} must be one of: {', '.join(SUPPORTED_MODES)}."
+    )
+
+
 def _prompt_voice_tracks(num_tracks: int, default_mode: str) -> list[VoiceTrack]:
     tracks: list[VoiceTrack] = []
     for idx in range(num_tracks):
@@ -59,6 +70,11 @@ def _prompt_voice_tracks(num_tracks: int, default_mode: str) -> list[VoiceTrack]
             show_default=False,
             prompt_required=False,
         )
+        if mode_override.strip():
+            mode_override = _normalize_mode(
+                mode_override,
+                f"{track_id} overlap mode",
+            )
         tracks.append(
             VoiceTrack(
                 id=track_id,
@@ -84,6 +100,7 @@ def tui(project_path: Path = Path("projects/new_project.json")) -> None:
         "Overlap mode",
         default="single",
     )
+    script_mode = _normalize_mode(script_mode, "Overlap mode")
     repeat_each = typer.prompt("Repeat each line", default=1, type=int)
     gap_ms = typer.prompt("Gap between lines (ms)", default=400, type=int)
     shuffle = typer.confirm("Shuffle lines", default=False)
