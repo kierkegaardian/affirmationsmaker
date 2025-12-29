@@ -68,20 +68,20 @@ class StableAudioOpenProvider:
         except Exception as exc:  # pragma: no cover - optional dependency
             raise RuntimeError("stable_audio_tools inference module not available") from exc
 
+        sig = inspect.signature(generate_diffusion_cond)
+        step_param = "num_steps" if "num_steps" in sig.parameters else "steps"
+        sampler_param = "sampler_type" if "sampler_type" in sig.parameters else "sampler"
         kwargs = {
             "model": self._model,
             "config": self._config,
             "device": self._device_in_use,
             "seed": int(seed),
-            "steps": int(self.steps),
-            "num_steps": int(self.steps),
-            "sampler_type": self.sampler,
-            "sampler": self.sampler,
+            step_param: int(self.steps) if step_param in sig.parameters else None,
+            sampler_param: self.sampler if sampler_param in sig.parameters else None,
             "sigma_min": self.sigma_min,
             "sigma_max": self.sigma_max,
             "guidance_scale": self.guidance_scale,
         }
-        sig = inspect.signature(generate_diffusion_cond)
         if "conditioning" in sig.parameters:
             conditioning = [{"prompt": prompt, "seconds_total": float(duration_sec)}]
             if bpm is not None:
