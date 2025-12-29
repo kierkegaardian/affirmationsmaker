@@ -10,7 +10,10 @@ import soundfile as sf
 from affirmbeat.core.hashing import hash_dict
 from affirmbeat.core.paths import cache_dir, output_dir
 from affirmbeat.core.project import Project
-from affirmbeat.core.content_check import find_content_warnings
+from affirmbeat.core.content_check import (
+    find_content_warnings,
+    find_content_warnings_for_texts,
+)
 from affirmbeat.providers.music_placeholder import PlaceholderMusicProvider
 from affirmbeat.providers.music_stable_audio import StableAudioOpenProvider
 from affirmbeat.providers.tts_dummy import DummyTTSProvider
@@ -53,11 +56,11 @@ def _music_provider(project: Project):
     return PlaceholderMusicProvider(project.sample_rate)
 
 
-def _tts_cache_key(project: Project, text: str) -> str:
+def _tts_cache_key(project: Project, text: str, voice: str | None) -> str:
     return hash_dict(
         {
             "provider": project.tts.provider,
-            "voice": project.tts.voice,
+            "voice": voice,
             "rate": project.tts.rate,
             "model_path": project.tts.model_path,
             "text": text,
@@ -71,11 +74,12 @@ def _load_or_synthesize_tts(
     project_path: Path,
     provider,
     text: str,
+    voice: str | None,
     report: dict[str, Any],
 ) -> np.ndarray:
     cache_root = cache_dir(project_path) / "tts"
     cache_root.mkdir(parents=True, exist_ok=True)
-    cache_key = _tts_cache_key(project, text)
+    cache_key = _tts_cache_key(project, text, voice)
     cache_path = cache_root / f"{cache_key}.wav"
     if cache_path.exists():
         audio, _ = sf.read(cache_path, dtype="float32")
@@ -83,7 +87,7 @@ def _load_or_synthesize_tts(
         return audio
     audio = provider.synthesize(
         text,
-        project.tts.voice,
+        voice,
         {
             "rate": project.tts.rate,
             "model_path": project.tts.model_path,
@@ -96,6 +100,12 @@ def _load_or_synthesize_tts(
 
 def render_project(project_path: Path) -> Path:
     project = _load_project(project_path)
+    content_warnings = find_content_warnings(project.affirmations)
+    if project.voice_tracks:
+        for track in project.voice_tracks:
+            content_warnings.extend(
+                find_content_warnings_for_texts(track.lines, track_id=track.id)
+            )
     report: dict[str, Any] = {
         "project_id": project.project_id,
         "tts_cached": [],
@@ -110,36 +120,86 @@ def render_project(project_path: Path) -> Path:
             "tts": project.tts.provider,
             "music": project.music.provider,
         },
-        "content_warnings": find_content_warnings(project.affirmations),
+        "content_warnings": content_warnings,
     }
+    if project.textgen is not None:
+        report["textgen"] = project.textgen.model_dump()
 
-    utterance_plans = build_utterance_plans(project.affirmations, project.script)
     tts = _tts_provider(project)
 
     total_samples = int(project.duration_sec * project.sample_rate)
     clips: list[Clip] = []
-    current_start = 0
-    gap_samples = int((project.script.gap_ms / 1000.0) * project.sample_rate)
-
-    for plan in utterance_plans:
-        audio = _load_or_synthesize_tts(project, project_path, tts, plan.text, report)
-        if audio.ndim > 1:
-            audio = audio[:, 0]
-        duration_samples = audio.shape[0]
-        for variant in plan.variants:
-            offset_samples = int((variant.offset_ms / 1000.0) * project.sample_rate)
-            clips.append(
-                Clip(
-                    audio=audio,
-                    start_sample=current_start + offset_samples,
-                    gain_db=variant.gain_db,
-                    pan=variant.pan,
-                    track=variant.track,
+    if project.voice_tracks:
+        for track in project.voice_tracks:
+            if not track.lines:
+                continue
+            script_cfg = project.script
+            if track.mode:
+                script_cfg = project.script.model_copy(update={"mode": track.mode})
+            utterance_plans = build_utterance_plans(track.lines, script_cfg)
+            current_start = int((track.start_offset_ms / 1000.0) * project.sample_rate)
+            gap_samples = int((script_cfg.gap_ms / 1000.0) * project.sample_rate)
+            for plan in utterance_plans:
+                audio = _load_or_synthesize_tts(
+                    project,
+                    project_path,
+                    tts,
+                    plan.text,
+                    track.voice or project.tts.voice,
+                    report,
                 )
+                if audio.ndim > 1:
+                    audio = audio[:, 0]
+                duration_samples = audio.shape[0]
+                for variant in plan.variants:
+                    offset_samples = int(
+                        (variant.offset_ms / 1000.0) * project.sample_rate
+                    )
+                    clips.append(
+                        Clip(
+                            audio=audio,
+                            start_sample=current_start + offset_samples,
+                            gain_db=variant.gain_db + track.gain_db,
+                            pan=variant.pan + track.pan,
+                            track=track.id,
+                        )
+                    )
+                current_start += duration_samples + gap_samples
+                if current_start >= total_samples:
+                    break
+    else:
+        utterance_plans = build_utterance_plans(
+            [item.text for item in project.affirmations],
+            project.script,
+        )
+        current_start = 0
+        gap_samples = int((project.script.gap_ms / 1000.0) * project.sample_rate)
+        for plan in utterance_plans:
+            audio = _load_or_synthesize_tts(
+                project,
+                project_path,
+                tts,
+                plan.text,
+                project.tts.voice,
+                report,
             )
-        current_start += duration_samples + gap_samples
-        if current_start >= total_samples:
-            break
+            if audio.ndim > 1:
+                audio = audio[:, 0]
+            duration_samples = audio.shape[0]
+            for variant in plan.variants:
+                offset_samples = int((variant.offset_ms / 1000.0) * project.sample_rate)
+                clips.append(
+                    Clip(
+                        audio=audio,
+                        start_sample=current_start + offset_samples,
+                        gain_db=variant.gain_db,
+                        pan=variant.pan,
+                        track=variant.track,
+                    )
+                )
+            current_start += duration_samples + gap_samples
+            if current_start >= total_samples:
+                break
 
     music = _music_provider(project)
     music_audio = build_music_bed(project, project_path, music, report)

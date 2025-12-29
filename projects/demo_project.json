@@ -14,6 +14,7 @@
       "tags": ["focus"]
     }
   ],
+  "voice_tracks": [],
   "script": {
     "mode": "triple_stack",
     "repeat_each": 4,
@@ -54,5 +55,6 @@
   "mix": {
     "master_peak_db": -1.0,
     "target_lufs": null
-  }
+  },
+  "textgen": null
 }

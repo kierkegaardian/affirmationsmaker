@@ -19,6 +19,8 @@ Outputs land in `projects/output/` by default.
 
 - `affirmbeat init <project.json>`
 - `affirmbeat add-affirmation <project.json> "text" --tag <tag>`
+- `affirmbeat tui [project.json]` (interactive wizard)
+- `affirmbeat generate-tracks <project.json> --prompt "..."`
 - `affirmbeat render <project.json>`
 
 Expected outputs:
@@ -46,6 +48,8 @@ Optional binaries are only needed when you select the corresponding provider:
 - Local-only alternative TTS: set `tts.provider` to `espeak` (requires `espeak` or `espeak-ng` in PATH).
 - Music provider defaults to placeholder noise. For Stable Audio Open, set `music.provider` to `stable_audio_open` and install `stable-audio-tools` + `torch`.
 - Render reports include `content_warnings` for possible negations/negative phrasing; it is non-blocking.
+- `affirmbeat tui` writes `voice_tracks` in `project.json`. Rendering uses `voice_tracks` when present; otherwise it falls back to `affirmations`.
+- LLM track generation uses a local Ollama instance by default (`OLLAMA_HOST`).
 
 Stable Audio Open dependencies currently install cleanly on Python 3.10/3.11. If you use `uv`, a working setup is:
 

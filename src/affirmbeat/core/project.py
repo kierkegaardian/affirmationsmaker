@@ -30,6 +30,25 @@ class TTSConfig(BaseModel):
     model_path: str | None = None
 
 
+class VoiceTrack(BaseModel):
+    id: str
+    voice: str | None = None
+    lines: list[str] = Field(default_factory=list)
+    gain_db: float = 0.0
+    pan: float = 0.0
+    start_offset_ms: int = 0
+    mode: str | None = None
+
+
+class TextGenConfig(BaseModel):
+    provider: str = "ollama"
+    model: str = "llama3.1:8b"
+    prompt: str = ""
+    num_tracks: int = 1
+    lines_per_track: int = 6
+    host: str | None = None
+
+
 class MusicConfig(BaseModel):
     provider: str = "placeholder"
     prompt: str = ""
@@ -66,8 +85,10 @@ class Project(BaseModel):
     sample_rate: int = 48_000
     duration_sec: int = 1_800
     affirmations: list[Affirmation] = Field(default_factory=list)
+    voice_tracks: list[VoiceTrack] = Field(default_factory=list)
     script: ScriptConfig = Field(default_factory=ScriptConfig)
     tts: TTSConfig = Field(default_factory=TTSConfig)
     music: MusicConfig = Field(default_factory=MusicConfig)
     binaural: BinauralConfig = Field(default_factory=BinauralConfig)
     mix: MixConfig = Field(default_factory=MixConfig)
+    textgen: TextGenConfig | None = None
