@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class Affirmation(BaseModel):
@@ -17,8 +17,8 @@ class ScriptConfig(BaseModel):
         "lead_whisper",
         "call_response",
     ] = "single"
-    repeat_each: int = 1
-    gap_ms: int = 400
+    repeat_each: int = Field(default=1, ge=1)
+    gap_ms: int = Field(default=400, ge=0)
     shuffle: bool = False
     seed: int = 0
 
@@ -54,8 +54,8 @@ class MusicConfig(BaseModel):
     prompt: str = ""
     seed: int = 0
     build_mode: str = "loop_crossfade"
-    chunk_sec: int = 30
-    crossfade_ms: int = 1500
+    chunk_sec: int = Field(default=30, gt=0)
+    crossfade_ms: int = Field(default=1500, ge=0)
     bpm: int | None = None
     model_id: str | None = None
     device: str | None = None
@@ -64,6 +64,16 @@ class MusicConfig(BaseModel):
     sigma_min: float | None = None
     sigma_max: float | None = None
     sampler: str | None = None
+
+    @model_validator(mode="after")
+    def validate_crossfade_chunk(self) -> "MusicConfig":
+        if self.build_mode == "loop_crossfade":
+            max_crossfade_ms = self.chunk_sec * 1000
+            if self.crossfade_ms > max_crossfade_ms:
+                raise ValueError(
+                    "music.crossfade_ms must be <= music.chunk_sec * 1000 when build_mode is loop_crossfade"
+                )
+        return self
 
 
 class BinauralConfig(BaseModel):
@@ -82,8 +92,8 @@ class MixConfig(BaseModel):
 
 class Project(BaseModel):
     project_id: str
-    sample_rate: int = 48_000
-    duration_sec: int = 1_800
+    sample_rate: int = Field(default=48_000, gt=0)
+    duration_sec: int = Field(default=1_800, gt=0)
     affirmations: list[Affirmation] = Field(default_factory=list)
     voice_tracks: list[VoiceTrack] = Field(default_factory=list)
     script: ScriptConfig = Field(default_factory=ScriptConfig)
