@@ -4,11 +4,23 @@ Local-first audio renderer for affirmation sessions: TTS + binaural beats + plac
 
 ## Quick start
 
-```bash
-python3.10 -m venv .venv
-source .venv/bin/activate
-pip install -e .
+### Automated Setup (Recommended)
 
+```bash
+# Run the setup script to install dependencies and create the virtual environment
+./setup.sh
+
+# Activate the environment
+source .venv/bin/activate
+
+# Launch the Web UI
+streamlit run src/affirmbeat/web_ui.py
+```
+
+### Manual CLI Usage
+
+```bash
+source .venv/bin/activate
 affirmbeat init projects/my_project.json
 affirmbeat render projects/my_project.json
 ```

@@ -17,6 +17,7 @@ dependencies = [
   "pyloudnorm>=0.1",
   "pydantic>=2.6",
   "typer>=0.9",
+  "streamlit>=1.30",
 ]
 
 [project.scripts]
