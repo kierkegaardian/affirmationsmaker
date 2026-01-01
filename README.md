@@ -9,8 +9,8 @@ python3.10 -m venv .venv
 source .venv/bin/activate
 pip install -e .
 
-affirmbeat init projects/demo_project.json
-affirmbeat render projects/demo_project.json
+affirmbeat init projects/my_project.json
+affirmbeat render projects/my_project.json
 ```
 
 Outputs land in `projects/output/` by default.
