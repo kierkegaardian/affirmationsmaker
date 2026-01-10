@@ -118,7 +118,16 @@ def tui(project_path: Path = Path("projects/new_project.json")) -> None:
     tts_rate = typer.prompt("TTS rate", default=1.0, type=float)
     tts_model_path = None
     if tts_provider == "piper1":
-        tts_model_path = typer.prompt("Piper model path", default="")
+        while True:
+            tts_model_path = typer.prompt(
+                "Piper model path",
+                default="",
+                show_default=False,
+                prompt_required=False,
+            )
+            if tts_model_path.strip():
+                break
+            typer.echo("Piper model path is required when provider is piper1.")
 
     num_tracks = typer.prompt("Number of lyric tracks", default=1, type=int)
     if num_tracks < 1:
