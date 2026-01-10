@@ -17,8 +17,11 @@
       ],
       "expected_files": [],
       "id": "task_001",
-      "status": "agent_done",
+      "status": "done",
       "title": "1.1 Repair render pipeline imports and provider selection (placeholder/file/stable audio).",
+      "verified_at": "2026-01-10T21:09:17+00:00",
+      "verified_by": "manual",
+      "verified_note": "renderer/provider fixes in place",
       "verify": [
         "python -m unittest discover -s tests"
       ]
@@ -32,8 +35,11 @@
       ],
       "expected_files": [],
       "id": "task_002",
-      "status": "agent_done",
+      "status": "done",
       "title": "1.2 Add render smoke tests for dummy TTS + placeholder/file music.",
+      "verified_at": "2026-01-10T21:09:20+00:00",
+      "verified_by": "manual",
+      "verified_note": "smoke tests added",
       "verify": [
         "python -m unittest discover -s tests"
       ]
@@ -47,8 +53,11 @@
       ],
       "expected_files": [],
       "id": "task_003",
-      "status": "pending",
+      "status": "done",
       "title": "2.1 Run `python -m unittest discover -s tests`.",
+      "verified_at": "2026-01-10T21:09:23+00:00",
+      "verified_by": "manual",
+      "verified_note": "unit tests OK",
       "verify": [
         "python -m unittest discover -s tests"
       ]
@@ -62,8 +71,11 @@
       ],
       "expected_files": [],
       "id": "task_004",
-      "status": "pending",
+      "status": "done",
       "title": "2.2 Run `affirmbeat render projects/demo_project.json` (optional sanity check).",
+      "verified_at": "2026-01-10T21:09:26+00:00",
+      "verified_by": "manual",
+      "verified_note": "demo render OK",
       "verify": [
         "affirmbeat render projects/demo_project.json"
       ]
