@@ -8,6 +8,7 @@ Local-first audio renderer for affirmation sessions: TTS + binaural beats + plac
 
 ```bash
 # Run the setup script to install dependencies and create the virtual environment
+# It will check for system tools (espeak, libsndfile) and ask if you want AI Music support.
 ./setup.sh
 
 # Activate the environment
@@ -26,6 +27,24 @@ affirmbeat render projects/my_project.json
 ```
 
 Outputs land in `projects/output/` by default.
+
+## Planner workflow (optional)
+
+This repo includes the Codex planner pipeline under `.plan-code-scripts/`.
+A `.envrc` file sets `GEMINI_BIN=gemini` for the Gemini CLI (run `direnv allow` to load it), or export it manually:
+
+```bash
+export GEMINI_BIN=gemini
+```
+
+Then follow the standard flow:
+
+```bash
+python3 .plan-code-scripts/specflow.py init
+python3 .plan-code-scripts/specflow.py proposal affirmations-builder
+python3 .plan-code-scripts/specflow.py plan affirmations-builder --pr affirmations-builder
+python3 .plan-code-scripts/preplan_gemini_review.py --repo . --pr affirmations-builder --model gemini-3-pro-preview
+```
 
 ## CLI spec (v0)
 

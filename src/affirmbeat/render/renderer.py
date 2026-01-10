@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -14,17 +15,18 @@ from affirmbeat.core.content_check import (
     find_content_warnings,
     find_content_warnings_for_texts,
 )
+from affirmbeat.dsp.binaural import generate_binaural
+from affirmbeat.providers.music_file import FileMusicProvider
 from affirmbeat.providers.music_placeholder import PlaceholderMusicProvider
 from affirmbeat.providers.music_stable_audio import StableAudioOpenProvider
 from affirmbeat.providers.tts_dummy import DummyTTSProvider
 from affirmbeat.providers.tts_espeak import EspeakTTSProvider
 from affirmbeat.providers.tts_piper1 import PiperTTSProvider
 from affirmbeat.render.export import export_audio
-from affirmbeat.render.music_bed import build_music_bed
 from affirmbeat.render.mixer import mix_tracks
+from affirmbeat.render.music_bed import build_music_bed
 from affirmbeat.render.timeline import Clip, place_clips
 from affirmbeat.script.scheduler import build_utterance_plans
-from affirmbeat.dsp.binaural import generate_binaural
 
 
 def _load_project(path: Path) -> Project:
@@ -41,11 +43,13 @@ def _tts_provider(project: Project):
 
 
 def _music_provider(project: Project):
+    if project.music.provider == "file":
+        return FileMusicProvider(project.sample_rate)
     if project.music.provider == "stable_audio_open":
         model_id = project.music.model_id or "stabilityai/stable-audio-open-1.0"
         return StableAudioOpenProvider(
             project.sample_rate,
-            model_id,
+            model_id=model_id,
             device=project.music.device,
             steps=project.music.steps,
             guidance_scale=project.music.guidance_scale,
@@ -53,6 +57,12 @@ def _music_provider(project: Project):
             sigma_max=project.music.sigma_max,
             sampler=project.music.sampler,
         )
+    if project.music.provider == "placeholder":
+        return PlaceholderMusicProvider(project.sample_rate)
+    warnings.warn(
+        f"Unknown music provider {project.music.provider!r}; using placeholder noise.",
+        RuntimeWarning,
+    )
     return PlaceholderMusicProvider(project.sample_rate)
 
 
@@ -216,7 +226,7 @@ def render_project(project_path: Path) -> Path:
         Clip(
             audio=music_audio,
             start_sample=0,
-            gain_db=-16.0,
+            gain_db=project.music.gain_db,
             pan=0.0,
             track="music",
         )

@@ -4,3 +4,9 @@ __pycache__/
 *.pyc
 cache/
 projects/output/
+# Codex planner/orchestrator
+.plans/**/runs/
+.plans/**/runs-*
+
+# macOS
+.DS_Store

@@ -1,0 +1,72 @@
+{
+  "created_at": "2026-01-10T20:35:12+00:00",
+  "goal": "Change Proposal: affirmations-builder",
+  "openspec": {
+    "change": "affirmations-builder",
+    "proposal": "openspec/changes/affirmations-builder/proposal.md",
+    "spec_deltas_dir": "openspec/changes/affirmations-builder/specs",
+    "tasks": "openspec/changes/affirmations-builder/tasks.md"
+  },
+  "tasks": [
+    {
+      "depends_on": [],
+      "description": "Implement this OpenSpec task for change `affirmations-builder`:\n\n- - [ ] 1.1 Repair render pipeline imports and provider selection (placeholder/file/stable audio).\n\nFollow `openspec/project.md` + `.plans/<PR>/CONTEXT.md`.\nDo not implement other tasks.",
+      "done_criteria": [
+        "Implementation matches the requirement implied by the task line.",
+        "Relevant tests/builds (if any) pass."
+      ],
+      "expected_files": [],
+      "id": "task_001",
+      "status": "agent_done",
+      "title": "1.1 Repair render pipeline imports and provider selection (placeholder/file/stable audio).",
+      "verify": [
+        "python -m unittest discover -s tests"
+      ]
+    },
+    {
+      "depends_on": [],
+      "description": "Implement this OpenSpec task for change `affirmations-builder`:\n\n- - [ ] 1.2 Add render smoke tests for dummy TTS + placeholder/file music.\n\nFollow `openspec/project.md` + `.plans/<PR>/CONTEXT.md`.\nDo not implement other tasks.",
+      "done_criteria": [
+        "Implementation matches the requirement implied by the task line.",
+        "Relevant tests/builds (if any) pass."
+      ],
+      "expected_files": [],
+      "id": "task_002",
+      "status": "agent_done",
+      "title": "1.2 Add render smoke tests for dummy TTS + placeholder/file music.",
+      "verify": [
+        "python -m unittest discover -s tests"
+      ]
+    },
+    {
+      "depends_on": [],
+      "description": "Implement this OpenSpec task for change `affirmations-builder`:\n\n- - [ ] 2.1 Run `python -m unittest discover -s tests`.\n\nFollow `openspec/project.md` + `.plans/<PR>/CONTEXT.md`.\nDo not implement other tasks.",
+      "done_criteria": [
+        "Implementation matches the requirement implied by the task line.",
+        "Relevant tests/builds (if any) pass."
+      ],
+      "expected_files": [],
+      "id": "task_003",
+      "status": "pending",
+      "title": "2.1 Run `python -m unittest discover -s tests`.",
+      "verify": [
+        "python -m unittest discover -s tests"
+      ]
+    },
+    {
+      "depends_on": [],
+      "description": "Implement this OpenSpec task for change `affirmations-builder`:\n\n- - [ ] 2.2 Run `affirmbeat render projects/demo_project.json` (optional sanity check).\n\nFollow `openspec/project.md` + `.plans/<PR>/CONTEXT.md`.\nDo not implement other tasks.",
+      "done_criteria": [
+        "Implementation matches the requirement implied by the task line.",
+        "Relevant tests/builds (if any) pass."
+      ],
+      "expected_files": [],
+      "id": "task_004",
+      "status": "pending",
+      "title": "2.2 Run `affirmbeat render projects/demo_project.json` (optional sanity check).",
+      "verify": [
+        "affirmbeat render projects/demo_project.json"
+      ]
+    }
+  ]
+}
