@@ -1,0 +1,49 @@
+{
+  "project_id": "228dd76d-2557-418e-b0c0-90c7046eea96",
+  "sample_rate": 48000,
+  "duration_sec": 1800,
+  "affirmations": [],
+  "voice_tracks": [],
+  "script": {
+    "mode": "single",
+    "repeat_each": 1,
+    "gap_ms": 400,
+    "shuffle": false,
+    "seed": 0
+  },
+  "tts": {
+    "provider": "dummy",
+    "voice": null,
+    "rate": 1.0,
+    "model_path": null
+  },
+  "music": {
+    "provider": "placeholder",
+    "prompt": "",
+    "seed": 0,
+    "build_mode": "loop_crossfade",
+    "chunk_sec": 30,
+    "crossfade_ms": 1500,
+    "bpm": null,
+    "model_id": null,
+    "device": null,
+    "steps": 100,
+    "guidance_scale": null,
+    "sigma_min": null,
+    "sigma_max": null,
+    "sampler": null
+  },
+  "binaural": {
+    "enabled": true,
+    "carrier_hz": 220.0,
+    "beat_hz": 6.0,
+    "gain_db": -30.0,
+    "fade_in_ms": 10000,
+    "fade_out_ms": 10000
+  },
+  "mix": {
+    "master_peak_db": -1.0,
+    "target_lufs": null
+  },
+  "textgen": null
+}
