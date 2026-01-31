@@ -20,6 +20,12 @@ dependencies = [
   "streamlit>=1.30",
 ]
 
+[project.optional-dependencies]
+ai = [
+  "stable-audio-tools",
+  "torch",
+]
+
 [project.scripts]
 affirmbeat = "affirmbeat.cli.main:app"
 

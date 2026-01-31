@@ -1,0 +1,83 @@
+{
+  "project_id": "biblical-wisdom-theta",
+  "sample_rate": 48000,
+  "duration_sec": 300,
+  "affirmations": [
+    {
+      "id": "a1",
+      "text": "I trust in the Lord with all my heart and do not lean on my own understanding.",
+      "tags": ["trust"]
+    },
+    {
+      "id": "a2",
+      "text": "I commit my work to the Lord, and my plans are established.",
+      "tags": ["work"]
+    },
+    {
+      "id": "a3",
+      "text": "I guard my heart with all vigilance, for from it flow the springs of life.",
+      "tags": ["heart"]
+    },
+    {
+      "id": "a4",
+      "text": "I walk with the wise and become wise.",
+      "tags": ["wisdom"]
+    },
+    {
+      "id": "a5",
+      "text": "A soft answer turns away wrath, and I speak with kindness.",
+      "tags": ["speech"]
+    },
+    {
+      "id": "a6",
+      "text": "I am diligent in my business and I will stand before kings.",
+      "tags": ["diligence"]
+    },
+    {
+      "id": "a7",
+      "text": "I listen to counsel and accept instruction, that I may be wise in my future.",
+      "tags": ["learning"]
+    }
+  ],
+  "voice_tracks": [],
+  "script": {
+    "mode": "triple_stack",
+    "repeat_each": 2,
+    "gap_ms": 1500,
+    "shuffle": false,
+    "seed": 42
+  },
+  "tts": {
+    "provider": "piper1",
+    "voice": null,
+    "rate": 1.0,
+    "model_path": "/home/user/affirmbeat/models/en_US-lessac-medium.onnx"
+  },
+  "music": {
+    "provider": "placeholder",
+    "prompt": "Deep ambient drone, meditative, ancient atmosphere, slow tempo",
+    "seed": 777,
+    "build_mode": "loop_crossfade",
+    "chunk_sec": 30,
+    "crossfade_ms": 2000,
+    "bpm": 60,
+    "gain_db": -8.0,
+    "model_id": "stabilityai/stable-audio-open-1.0",
+    "device": "cpu",
+    "steps": 25,
+    "guidance_scale": 5.0
+  },
+  "binaural": {
+    "enabled": true,
+    "carrier_hz": 150,
+    "beat_hz": 6.0,
+    "gain_db": -25,
+    "fade_in_ms": 5000,
+    "fade_out_ms": 5000
+  },
+  "mix": {
+    "master_peak_db": -1.0,
+    "target_lufs": -16.0
+  },
+  "textgen": null
+}

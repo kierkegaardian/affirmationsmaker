@@ -25,29 +25,50 @@ fi
 
 echo -e "Found Python $PY_VERSION"
 
-# 2. System Dependencies (libsndfile)
+# 2. System Dependencies (libsndfile + espeak-ng)
 echo -e "\n${YELLOW}Checking system dependencies...${NC}"
 
+install_pkg() {
+    PKG=$1
+    if command -v apt-get &> /dev/null; then
+        echo "Detected apt. Running: sudo apt-get install -y $PKG"
+        sudo apt-get install -y "$PKG"
+    elif command -v dnf &> /dev/null; then
+         echo "Detected dnf. Running: sudo dnf install -y $PKG"
+         sudo dnf install -y "$PKG"
+    elif command -v pacman &> /dev/null; then
+         echo "Detected pacman. Running: sudo pacman -S --noconfirm $PKG"
+         sudo pacman -S --noconfirm "$PKG"
+    else
+        echo -e "${RED}Could not identify package manager. Please install '$PKG' manually.${NC}"
+    fi
+}
+
+# Check libsndfile
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     if ! ldconfig -p | grep -q libsndfile; then
-        echo -e "${YELLOW}libsndfile not found. Attempting to identify package manager...${NC}"
-        if command -v apt-get &> /dev/null; then
-            echo "Detected apt. Please run: sudo apt-get install libsndfile1-dev"
-        elif command -v dnf &> /dev/null; then
-             echo "Detected dnf. Please run: sudo dnf install libsndfile"
-        elif command -v pacman &> /dev/null; then
-             echo "Detected pacman. Please run: sudo pacman -S libsndfile"
-        else
-            echo -e "${RED}Could not identify package manager. Please install 'libsndfile' manually.${NC}"
-        fi
-        # We don't exit here because checking ldconfig isn't perfect and user might have it elsewhere
-        read -p "Press Enter to continue if you have installed libsndfile, or Ctrl+C to abort."
+        echo -e "${YELLOW}libsndfile not found.${NC}"
+        install_pkg "libsndfile1-dev" || install_pkg "libsndfile"
     else
          echo -e "${GREEN}libsndfile appears to be installed.${NC}"
     fi
+    
+    # Check espeak-ng
+    if ! command -v espeak-ng &> /dev/null && ! command -v espeak &> /dev/null; then
+        echo -e "${YELLOW}espeak-ng not found (required for TTS).${NC}"
+        install_pkg "espeak-ng"
+    else
+        echo -e "${GREEN}espeak found.${NC}"
+    fi
+
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     if ! brew list libsndfile &> /dev/null; then
-        echo "Detected macOS. Please run: brew install libsndfile"
+        echo "Detected macOS. Installing libsndfile..."
+        brew install libsndfile
+    fi
+    if ! brew list espeak &> /dev/null; then
+        echo "Detected macOS. Installing espeak..."
+        brew install espeak
     fi
 fi
 
@@ -69,12 +90,23 @@ source "$VENV_DIR/bin/activate"
 # Upgrade pip
 pip install --upgrade pip
 
-# Install project in editable mode
+# Install core project
 pip install -e .
+
+# 5. Optional AI Dependencies
+echo -e "\n${YELLOW}AI Music Generation (Optional)${NC}"
+echo "Stable Audio Open requires installing heavy dependencies (Torch, stable-audio-tools)."
+read -p "Do you want to install these AI components now? [y/N] " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo -e "${YELLOW}Installing AI dependencies (this may take a while)...${NC}"
+    pip install -e ".[ai]"
+    echo -e "${GREEN}AI components installed.${NC}"
+else
+    echo "Skipping AI components."
+fi
 
 echo -e "\n${GREEN}Setup complete!${NC}"
 echo -e "To start the Web UI, run:"
 echo -e "  ${YELLOW}source .venv/bin/activate${NC}"
 echo -e "  ${YELLOW}streamlit run src/affirmbeat/web_ui.py${NC}"
-echo -e "\nTo use the CLI:"
-echo -e "  ${YELLOW}affirmbeat --help${NC}"

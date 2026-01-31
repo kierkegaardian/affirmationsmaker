@@ -140,8 +140,8 @@ with tabs[2]:
     st.subheader("Background Music")
     m_provider = st.selectbox(
         "Music Provider",
-        ["placeholder", "stable_audio_open"],
-        index=["placeholder", "stable_audio_open"].index(project.music.provider)
+        ["placeholder", "stable_audio_open", "file"],
+        index=["placeholder", "stable_audio_open", "file"].index(project.music.provider) if project.music.provider in ["placeholder", "stable_audio_open", "file"] else 0
     )
     project.music.provider = m_provider
     
@@ -150,10 +150,28 @@ with tabs[2]:
         project.music.prompt = st.text_area("Music Prompt", value=project.music.prompt)
         project.music.model_id = st.text_input("Model ID", value=project.music.model_id or "stabilityai/stable-audio-open-1.0")
         project.music.seed = st.number_input("Seed", value=project.music.seed)
+    elif m_provider == "file":
+        st.info("Uses a local audio file. Supports WAV, MP3, FLAC, OGG.")
+        file_path_input = st.text_input("Path to Audio File", value=project.music.prompt, help="Absolute path to your music file")
+        project.music.prompt = file_path_input
+        if file_path_input and Path(file_path_input).exists():
+            st.success("File found!")
+        elif file_path_input:
+            st.error("File not found.")
+        # Auto-configure chunk size to avoid looping glitches
+        if project.music.chunk_sec < project.duration_sec:
+             project.music.chunk_sec = project.duration_sec
+             st.caption(f"Chunk size auto-adjusted to {project.duration_sec}s to prevent restarting.")
     else:
         st.info("Uses a generated sine-tone placeholder track.")
 
     project.music.crossfade_ms = st.slider("Loop Crossfade (ms)", 0, 5000, project.music.crossfade_ms)
+    
+    # Gain control
+    # Check if gain_db exists (added in recent update)
+    current_gain = getattr(project.music, "gain_db", -16.0)
+    music_gain = st.slider("Music Volume (dB)", -40.0, 0.0, float(current_gain))
+    project.music.gain_db = music_gain
 
 
 # --- Tab 4: Binaural Beats ---

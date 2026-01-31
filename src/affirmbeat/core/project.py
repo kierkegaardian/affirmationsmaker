@@ -57,6 +57,7 @@ class MusicConfig(BaseModel):
     chunk_sec: int = Field(default=30, gt=0)
     crossfade_ms: int = Field(default=1500, ge=0)
     bpm: int | None = None
+    gain_db: float = -16.0
     model_id: str | None = None
     device: str | None = None
     steps: int = 100
